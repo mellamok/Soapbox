@@ -1,3 +1,0 @@
-id	screen_name	name	created_at	url	followers_count	friends_count	statuses_count	favourites_count	listed_count	contributors_enabled	description	protected	location	lang	expanded_url
-141598384		Man Repeller	Sat May 08 14:06:24 +0000 2010	https://t.co/ZnRKnEs9AL	388423	421	49533	19005	3110	False	A judgment-free zone where no topic is off-limits for intellectual dissection. Come for the fashion, stay for the jokes.	False	The Internet	en	http://www.manrepeller.com/
-431728429		Hal Singer	Thu Dec 08 16:33:37 +0000 2011	https://t.co/HKCL1EPyEM	2834	1575	13154	13121	98	False	Principal at Economists Inc | Contributor @Forbes | Adjunct Professor @MSBGU | Senior Fellow @GWIPPGWU | Editor @WashingtonBytes	False	Washington, D.C.	en	http://www.forbes.com/sites/halsinger/

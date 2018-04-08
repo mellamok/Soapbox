@@ -1,8 +1,3 @@
-#!/usr/bin/python
-#-*-coding:utf-8-*-
-#!/usr/bin/env python
-
-
 import sys
 import urllib
 import string
@@ -23,7 +18,6 @@ from sqlalchemy import Text #
 from sqlalchemy import DECIMAL
 from sqlalchemy import Unicode
 
-
 from sqlalchemy.sql import join
 from types import *
 
@@ -40,11 +34,10 @@ t = Twython(app_key="xk2ajQiez4T2FYn9KFaNQ2P4D",
 
 Base = declarative_base()
 
-
 class Messages(Base):
     __tablename__ = 'hashtags'
     
-    id = Column(Integer, primary_key=True)  
+    id = Column(Integer, primary_key=True)
     query = Column(String)
     tweet_id = Column(String) 
     inserted_date = Column(DateTime)
@@ -66,6 +59,7 @@ class Messages(Base):
     from_user_location = Column(String)  
     from_user_created_at = Column(String)  
     retweet_count = Column(Integer)
+    favorite_count = Column(Integer)
     entities_urls = Column(Unicode(255))
     entities_urls_count = Column(Integer)        
     entities_hashtags = Column(Unicode(255))
@@ -89,10 +83,9 @@ class Messages(Base):
     retweeted_status, created_at_text, created_at, content, 
     from_user_screen_name, from_user_id, from_user_followers_count, from_user_friends_count,   
     from_user_listed_count, from_user_statuses_count, from_user_description,   
-    from_user_location, from_user_created_at, retweet_count, entities_urls,entities_urls_count,         
+    from_user_location, from_user_created_at, retweet_count, favorite_count, entities_urls,entities_urls_count,         
     entities_hashtags, entities_hashtags_count,entities_mentions,entities_mentions_count, in_reply_to_screen_name, in_reply_to_status_id, source, entities_expanded_urls, json_output, 
-    entities_media_count, media_expanded_url, media_url, media_type,video_link, photo_link,twitpic  
-    ):        
+    entities_media_count, media_expanded_url, media_url, media_type,video_link, photo_link,twitpic):        
         self.query = query
         self.tweet_id = tweet_id
         self.inserted_date = inserted_date
@@ -114,6 +107,7 @@ class Messages(Base):
         self.from_user_location = from_user_location
         self.from_user_created_at = from_user_created_at
         self.retweet_count = retweet_count
+        self.favorite_count = favorite_count
         self.entities_urls = entities_urls
         self.entities_urls_count = entities_urls_count        
         self.entities_hashtags = entities_hashtags
@@ -201,6 +195,7 @@ def write_data(self, d):
         from_user_created_at = entry['user']['created_at']
         
         retweet_count = entry['retweet_count'] 
+        favorite_count = entry['favorite_count']
         
         in_reply_to_screen_name = entry['in_reply_to_screen_name']
         in_reply_to_status_id = entry['in_reply_to_status_id']
@@ -317,7 +312,7 @@ def write_data(self, d):
                 coordinates, retweeted_status, created_at_text, 
                 created_at, content, from_user_screen_name, from_user_id, from_user_followers_count, 
                 from_user_friends_count, from_user_listed_count, from_user_statuses_count, from_user_description,   
-                from_user_location, from_user_created_at, retweet_count, entities_urls, entities_urls_count,         
+                from_user_location, from_user_created_at, retweet_count, favorite_count, entities_urls, entities_urls_count,         
                 entities_hashtags, entities_hashtags_count, entities_mentions,entities_mentions_count, in_reply_to_screen_name, in_reply_to_status_id, source, entities_expanded_urls, json_output, 
                 entities_media_count, media_expanded_url, media_url, media_type,video_link, photo_link,twitpic
                 )
