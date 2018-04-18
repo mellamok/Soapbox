@@ -1,9 +1,12 @@
 """
 PULLER
 
-Version: 1.0
-Date: 6 Apr 2018
 Author: Kathryn Karasek
+
+Pip install the following before beginning:
+simplejson
+sqlalchemy
+twython
 
 This file does the following:
 1) Imports necessary packages
