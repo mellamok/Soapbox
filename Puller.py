@@ -218,15 +218,15 @@ def write_data(self, d):
                 url = link['url']
                 entities_urls.append(url)
                 
-        entities_mentions = string.join(entities_mentions, u", ")
-        entities_hashtags = string.join(entities_hashtags, u", ")
-        entities_media = string.join(entities_media, u", ") 
-        entities_urls = string.join(entities_urls, u", ")
+        entities_mentions = ", ".join(entities_mentions)
+        entities_hashtags = ", ".join(entities_hashtags)
+        entities_media = ", ".join(entities_media) 
+        entities_urls = ", ".join(entities_urls)
                
-        entities_hashtags = unicode(entities_hashtags)
-        entities_mentions = unicode(entities_mentions)
-        entities_media = unicode(entities_media)
-        entities_urls = unicode(entities_urls)
+        entities_hashtags = str(entities_hashtags)
+        entities_mentions = str(entities_mentions)
+        entities_media = str(entities_media)
+        entities_urls = str(entities_urls)
 
         in_reply_to_screen_name = entry['in_reply_to_screen_name']
         in_reply_to_status_id = entry['in_reply_to_status_id']
