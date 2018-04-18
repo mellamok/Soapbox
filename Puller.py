@@ -142,11 +142,12 @@ def get_data(kid, max_id=None):
     try:
         d = t.search(q=kid, count = '100', result_type = 'recent', lang = 'en', max_id = max_id, tweet_mode='extended') # lang = 'en'
         
-    except Exception, e:
-        print "Error reading id %s, exception: %s" % (kid, e)
+    except Exception as e:
+        print ("Error reading id %s, exception: %s" % (kid, e))
+        #print "Error reading id %s, exception: %s" % (kid, e)
         return None
-    print "d.keys(): ", d.keys()   
-    print "Number of statuses: ", len(d['statuses'])
+    print ("d.keys(): ", d.keys())   
+    print ("Number of statuses: ", len(d['statuses']))
     return d
 
 # 5) Builds dataset from relevant tweets
@@ -217,15 +218,15 @@ def write_data(self, d):
                 url = link['url']
                 entities_urls.append(url)
                 
-        entities_mentions = string.join(entities_mentions, u", ")
-        entities_hashtags = string.join(entities_hashtags, u", ")
-        entities_media = string.join(entities_media, u", ") 
-        entities_urls = string.join(entities_urls, u", ")
+        entities_mentions = ", ".join(entities_mentions)
+        entities_hashtags = ", ".join(entities_hashtags)
+        entities_media = ", ".join(entities_media) 
+        entities_urls = ", ".join(entities_urls)
                
-        entities_hashtags = unicode(entities_hashtags)
-        entities_mentions = unicode(entities_mentions)
-        entities_media = unicode(entities_media)
-        entities_urls = unicode(entities_urls)
+        entities_hashtags = str(entities_hashtags)
+        entities_mentions = str(entities_mentions)
+        entities_media = str(entities_media)
+        entities_urls = str(entities_urls)
 
         in_reply_to_screen_name = entry['in_reply_to_screen_name']
         in_reply_to_status_id = entry['in_reply_to_status_id']
@@ -250,10 +251,10 @@ def write_data(self, d):
       
         else:
             if len(updates) > 1:
-                print "Warning: more than one update matching to_user=%s, text=%s"\
-                        % (to_user, content)
+                print ("Warning: more than one update matching to_user=%s, text=%s"\
+                        % (to_user, content))
             else:
-                print "Not inserting, dupe.."
+                print ("Not inserting, dupe..")
         
         self.session.commit()
         
@@ -261,7 +262,7 @@ def write_data(self, d):
 class Scrape:
     def __init__(self): 
         # Name SQL file after minute created (for Ranker pull)   
-        engine = sqlalchemy.create_engine("sqlite:///Data %d %d %d %d %d.sqlite" 
+        engine = sqlalchemy.create_engine("sqlite:///Puller Data/Testfile %d %d %d %d %d.sqlite" 
         % (now.year, now.month, now.day, now.hour, minute_round), echo=False)  
         Session = sessionmaker(bind=engine)
         self.session = Session()  
@@ -270,15 +271,15 @@ class Scrape:
     # Keep searching until a full page with 0 relevant tweets is found
     def main(self):
         for n, kid in enumerate(ids):
-            print "\rprocessing id %s/%s" % (n+1, len(ids)),
-            sys.stdout.flush()
+            print ("\rprocessing id %s/%s" % (n+1, len(ids)),
+            sys.stdout.flush())
 
             d = get_data(kid)
             if not d:
                 continue	 
             
             if len(d['statuses'])==0:
-                print "No new statuses"
+                print ("No new statuses")
                 continue
                 
             write_data(self, d)
@@ -292,11 +293,11 @@ class Scrape:
 
             if len(d['statuses']) >1:
           
-                print "Now looking earlier..."
+                print ("Now looking earlier...")
               
                 count = 2
                 while count < 10:
-                    print "Page:", count
+                    print ("Page:", count)
                     d = get_data(kid, max_id)
                     
                     if not d:
@@ -316,14 +317,14 @@ class Scrape:
                     write_data(self, d) 
                     self.session.commit()
                     
-                    print "Pages complete:", len(d['statuses']), count
+                    print ("Pages complete:", len(d['statuses']), count)
                     if not len(d['statuses']) > 0:
     
-                        print "Done. Next ID."
+                        print ("Done. Next ID.")
                         break                    
                     count += 1
                     if count >10:
-                        print "Done"
+                        print ("Done")
                         break
             self.session.commit()
 
