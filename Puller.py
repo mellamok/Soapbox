@@ -50,11 +50,6 @@ from datetime import datetime, date, time
 
 # 2) Sets program parameters
 
-# Choose how often to pull data:
-now = datetime.now()
-every_x_minutes=1
-minute_round = math.floor(now.minute/every_x_minutes)*every_x_minutes
-
 # Set search terms
 ids = ["\"#soapbox\"",]
 
@@ -263,10 +258,10 @@ def write_data(self, d):
         
 # 6) Exports dataset to SQL
 class Scrape:
-    def __init__(self): 
+    def __init__(self, filename): 
         # Name SQL file after minute created (for Ranker pull)   
-        engine = sqlalchemy.create_engine("sqlite:///Puller Data/Testfile %d %d %d %d %d.sqlite" 
-        % (now.year, now.month, now.day, now.hour, minute_round), echo=False)  
+        engine = sqlalchemy.create_engine("sqlite:///Puller Data/%s" 
+        % (filename), echo=False)
         Session = sessionmaker(bind=engine)
         self.session = Session()  
         Base.metadata.create_all(engine)
@@ -331,11 +326,8 @@ class Scrape:
                         break
             self.session.commit()
 
-
         self.session.close()
 
-
-
 if __name__ == "__main__":
-    s = Scrape()
+    s = Scrape("testfile")
     s.main()
