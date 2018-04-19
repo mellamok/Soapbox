@@ -54,10 +54,10 @@ def datapull_master(conn_master):
     #for row in rows:
     #   print(row)
 
-def to_csv(dataframe):
+def to_csv(dataframe, filename):
     cwd = os.getcwd()
     savedir = cwd + "\\CSV Output\\"
-    csvpath = savedir + "output.csv"
+    csvpath = savedir + filename
     with open(csvpath, 'w', newline='', encoding='utf-8') as csvfile: #utf-16 also works(ish)
         fieldnames = ['Tweet_ID', 'Tweet_Date', 'User_Name', 'User_ID', 'Favorite_CT', 'Retweet_CT', 'Content']
         dictwriter = csv.DictWriter(csvfile, fieldnames=fieldnames)
@@ -79,4 +79,4 @@ if __name__ == "__main__":
     x = datapull_master(conn_master) #Pull all data from hastags table and display it
     for row in x:
         print(row)
-    to_csv(x)
+    to_csv(x, "testfile")
