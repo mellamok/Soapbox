@@ -1,13 +1,8 @@
 """
 PULLER
-
+Version: 1.0
+Date: 6 Apr 2018
 Author: Kathryn Karasek
-
-Pip install the following before beginning:
-simplejson
-sqlalchemy
-twython
-
 This file does the following:
 1) Imports necessary packages
 2) Sets program parameters
@@ -15,11 +10,9 @@ This file does the following:
 4) Pulls relevant tweets from Twitter
 5) Builds dataset from relevant tweets
 6) Exports dataset to SQL
-
 Outstanding issues:
 * Truncating retweets
 * Including tweets without #Soapbox (Why?)
-
 """
 # 1) Imports necessary packages
 import sys
@@ -44,7 +37,6 @@ from sqlalchemy import DECIMAL
 from sqlalchemy import Unicode
 
 from sqlalchemy.sql import join
-from types import *
 
 from datetime import datetime, date, time
 
@@ -153,8 +145,6 @@ def write_data(self, d):
 
     query = d['search_metadata']['query']
     
-    number_on_page = len(d['statuses'])
-    ids = []
     for entry in d['statuses']:
 
         tweet_id = entry['id']
@@ -250,7 +240,7 @@ def write_data(self, d):
         else:
             if len(updates) > 1:
                 print ("Warning: more than one update matching to_user=%s, text=%s"\
-                        % (to_user, content))
+                        % (from_user_screen_name, content))
             else:
                 print ("Not inserting, dupe..")
         
@@ -315,7 +305,7 @@ class Scrape:
                     write_data(self, d) 
                     self.session.commit()
                     
-                    print ("Pages complete:", len(d['statuses']), count)
+                    print ("Pages complete:", len(d['statuses']))
                     if not len(d['statuses']) > 0:
     
                         print ("Done. Next ID.")
