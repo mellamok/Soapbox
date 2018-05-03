@@ -43,7 +43,7 @@ from datetime import datetime, date, time
 # 2) Sets program parameters
 
 # Set search terms
-ids = ["\"#soapbox\"",]
+ids = ["\"#soapbox\"", "\"@internetsoapbox\",]
 
 # Store Twitter OAuth information     
 from twython import Twython
