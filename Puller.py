@@ -1,7 +1,6 @@
 """
 PULLER
-Version: 1.0
-Date: 6 Apr 2018
+Date: 4 May 2018
 Author: Kathryn Karasek
 This file does the following:
 1) Imports necessary packages
@@ -43,7 +42,7 @@ from datetime import datetime, date, time
 # 2) Sets program parameters
 
 # Set search terms
-ids = ["\"#soapbox\"", "\"@internetsoapbox\",]
+ids = ["%23soapbox -filter:retweets -filter:media", "@internetsoapbox -filter:retweets -filter:media",]
 
 # Store Twitter OAuth information     
 from twython import Twython
@@ -130,7 +129,7 @@ class Messages(Base):
 # 4) Pulls relevant tweets from Twitter
 def get_data(kid, max_id=None):
     try:
-        d = t.search(q=kid, count = '100', result_type = 'recent', lang = 'en', max_id = max_id, tweet_mode='extended') # lang = 'en'
+        d = t.search(q=kid, count = '100', result_type = 'recent', lang = 'en', max_id = max_id, tweet_mode='extended')
         
     except Exception as e:
         print ("Error reading id %s, exception: %s" % (kid, e))
