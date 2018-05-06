@@ -3,9 +3,9 @@ RANKER VERSION 1.0 (3.5.18)
 Py 3.X
 Augustus Urschel
 
-By [X]All-Time []Daily []Hourly:
+By [X]All-Time [X]Daily [X]Hourly:
     2) Pull relevant data from Master
-    3) Filter out bad tweets on [X] 0 Score []Profanity []Suspected AI []Other
+    3) Filter out bad tweets on [] 0 Score []Profanity []Suspected AI []Other
     4) Score & Rank Tweets on [X]Retweets [X]Likes []Patronage
     5) Save for Scoreboard
 '''
@@ -13,6 +13,7 @@ By [X]All-Time []Daily []Hourly:
 import os
 import string
 import sqlite3
+import datetime
 from sqlite3 import Error
 import csv
 
@@ -23,6 +24,8 @@ class Ranker:
         self.iteration_str = iteration_str
         self.iteration_input = "Puller {iteration_str}.sqlite".format(iteration_str=iteration_str)
         self.iteration_output = "Ranker {iteration_str} {cycle}.csv".format(iteration_str=iteration_str, cycle=cycle)
+        '{:02d}'.format(self.iteration.month)
+        '{:02d}'.format(self.iteration.day)
 
     def create_master_connection(self):
         """Connects to the maintwitter data pull"""
@@ -48,8 +51,9 @@ class Ranker:
         self.filtervars ='language, entities_media_count, retweeted_status, truncated'
         self.filters = '''language = 'en' AND entities_media_count = 0 AND retweeted_status = '' AND truncated = 0'''
         self.ordering = 'score DESC'
+        self.tweet_dt = 'created_at'
         self.c = connect.cursor()
-        #Create modified table if it does not exist
+        #Create modified table (drop if exists)
         self.c.execute("DROP TABLE IF EXISTS {newtab}".format(newtab=self.newtable))
         self.c.execute("CREATE TABLE {newtab} AS SELECT {vars}, {filtervars} FROM {oldtab}" \
             .format(newtab=self.newtable, vars=self.pullvars, filtervars=self.filtervars, oldtab=self.oldtable))
@@ -59,14 +63,24 @@ class Ranker:
         self.c.execute("UPDATE {tn} SET {scorecol} = {fvt} + 5*{rt}"\
             .format(tn=self.newtable, scorecol=self.scorecol, fvt='favorite_count', rt='retweet_count'))
         connect.commit()
-        #Pull from table
-        self.c.execute("SELECT {vars_m} FROM {tn} WHERE {filter} ORDER BY {order}" \
-            .format(vars_m=self.modvars, tn=self.newtable, filter=self.filters, order=self.ordering))
+        #Pull from table, by cycle
+
+        if self.cycle == "alltime":
+            self.c.execute("SELECT {vars_m} FROM {tn} WHERE {filter} ORDER BY {order}" \
+                .format(vars_m=self.modvars, tn=self.newtable, filter=self.filters, order=self.ordering))
+        elif self.cycle == "daily":
+            self.sql_daily_min = ('{year}-{month}-{day} 00:00:00.000000' \
+                .format(year=self.iteration.year, month='{:02d}'.format(self.iteration.month), day='{:02d}'.format(self.iteration.day)))
+            self.c.execute("SELECT {vars_m} FROM {tn} WHERE {filter} AND {datecol} >= '{datelimit}' ORDER BY {order}" \
+                .format(vars_m=self.modvars, tn=self.newtable, filter=self.filters, datecol=self.tweet_dt, datelimit=self.sql_daily_min, order=self.ordering))
+        elif self.cycle == "hourly":
+            self.sql_hourly_min = ('{year}-{month}-{day} {hour}:00:00.000000' \
+                .format(year=self.iteration.year, month='{:02d}'.format(self.iteration.month), day='{:02d}'.format(self.iteration.day), hour='{:02d}'.format(self.iteration.hour)))
+            self.c.execute("SELECT {vars_m} FROM {tn} WHERE {filter} AND {datecol} >= '{datelimit}' ORDER BY {order}" \
+                .format(vars_m=self.modvars, tn=self.newtable, filter=self.filters, datecol=self.tweet_dt, datelimit=self.sql_hourly_min, order=self.ordering))
+
         self.data = self.c.fetchall() #note: This reads all data in the cursor to memory. Will cause performance issues. Change to "for row in c: print row"
         return self.data
-
-        #for row in rows:
-        #   print(row)
 
     def to_csv(self, dataframe, iteration_output):
         """Write the data to a csv file"""
@@ -95,6 +109,7 @@ class Ranker:
 
 #Run
 if __name__ == "__main__":
-    fakedatetime = 0
-    x = Ranker(fakedatetime, "2018 4 19 20 52", "alltime")
+    fakedate = datetime.datetime(2018, 4, 19, hour=20, minute=52, second=7)
+    fakedate_str = "%d %d %d %d %d" % (fakedate.year, fakedate.month, fakedate.day, fakedate.hour, fakedate.minute)
+    x = Ranker(fakedate, fakedate_str, "daily")
     x.main()
