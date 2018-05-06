@@ -8,7 +8,8 @@ def cycle_1_min():
     now = datetime.datetime.now()
 
     #File components
-    iteration = "%d %d %d %d %d" % (now.year, now.month, now.day, now.hour, now.minute)
+    iteration = now
+    iteration_str = "%d %d %d %d %d" % (now.year, now.month, now.day, now.hour, now.minute)
     iteration_file_puller = "Puller %d %d %d %d %d.sqlite"  % (now.year, now.month, now.day, now.hour, now.minute)
     iteration_file_ranker = "Ranker %d %d %d %d %d.csv" % (now.year, now.month, now.day, now.hour, now.minute)
 
@@ -20,7 +21,7 @@ def cycle_1_min():
     
     #Do Alltime Ranker
     print("Ranker file = ", iteration_file_ranker)
-    alltime = Ranker.Ranker(iteration, "alltime")
+    alltime = Ranker.Ranker(iteration, iteration_str, "alltime")
     alltime.main()
     
     """ data_master_loc = Ranker.find_file_location(iteration_file_puller) #define the main data
