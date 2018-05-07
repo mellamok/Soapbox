@@ -9,28 +9,40 @@ def cycle_1_min():
 
     #File components
     iteration = now
-    iteration_str = "%d %d %d %d %d" % (now.year, now.month, now.day, now.hour, now.minute)
-    iteration_file_puller = "Puller %d %d %d %d %d.sqlite"  % (now.year, now.month, now.day, now.hour, now.minute)
-    iteration_file_ranker = "Ranker %d %d %d %d %d.csv" % (now.year, now.month, now.day, now.hour, now.minute)
+    iteration_str = "{year} {month} {day} {hour} {minute}".format(year=now.year, month=now.month, day=now.day, hour=now.hour, minute=now.minute)
+    iteration_file_puller = "Puller {year} {month} {day} {hour} {minute}.sqlite".format(year=now.year, month=now.month, day=now.day, hour=now.hour, minute=now.minute)
 
     #Do Puller
-    print("I play at every half minute in the day. The time is: ", datetime.datetime.now())
-    print("Puller file = ", iteration_file_puller)
+    print("Pulling file = ", iteration_file_puller)
     startpull = Puller.Scrape(iteration_file_puller)
     startpull.main()
+    print("Pulling complete!")
+    pullerfinish = datetime.datetime.now() - now
+    print("Time to Pull: ", pullerfinish)
     
+
     #Do Alltime Ranker
-    print("Ranker file = ", iteration_file_ranker)
+    print("Ranking alltime...")
     alltime = Ranker.Ranker(iteration, iteration_str, "alltime")
     alltime.main()
+    print("Ranking alltime complete!")
+
+    #Do Daily Ranker
+    print("Ranking daily...")
+    daily = Ranker.Ranker(iteration, iteration_str, "daily")
+    daily.main()
+    print("Ranking daily complete!")
     
-    """ data_master_loc = Ranker.find_file_location(iteration_file_puller) #define the main data
-    conn_master = Ranker.create_master_connection(data_master_loc) #connect to it
-    x = Ranker.datapull_master(conn_master) #Pull all data from hastags table and display it
-    for row in x:
-        print(row)
-    Ranker.to_csv(x, iteration_file_ranker)
-    # """
+    #Do Hourly Ranker
+    print("Ranking hourly...")
+    hourly = Ranker.Ranker(iteration, iteration_str, "hourly")
+    hourly.main()
+    print("Ranking hourly complete!")
+
+    #Program Time
+    finishtime = datetime.datetime.now() - now
+    print("Time to Complete: ", finishtime)
+
 scheduler=BlockingScheduler()
 scheduler.add_job(cycle_1_min, 'cron', second=1)
 scheduler.start()

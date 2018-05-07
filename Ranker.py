@@ -102,8 +102,8 @@ class Ranker:
     def main(self):
         self.connect = self.create_master_connection()
         self.x = self.datapull_master(self.connect)
-        for row in self.x:
-            print(row)
+        #for row in self.x:
+            #print(row)
         self.to_csv(self.x, self.iteration_output)
         self.connect.close()
 
