@@ -1,6 +1,7 @@
 import datetime
 import Puller
 import Ranker
+import Popcorn
 from apscheduler.schedulers.blocking import BlockingScheduler
 
 def cycle_1_min():
@@ -43,6 +44,55 @@ def cycle_1_min():
     finishtime = datetime.datetime.now() - now
     print("Time to Complete: ", finishtime)
 
-scheduler=BlockingScheduler()
-scheduler.add_job(cycle_1_min, 'cron', second=1)
-scheduler.start()
+    #return startvar and stable iterations
+    global stable_iteration
+    stable_iteration = iteration
+    global stable_iteration_str
+    stable_iteration_str = iteration_str
+
+    global regen_popcorn_flag
+    regen_popcorn_flag = 1
+
+    global first_start_var
+    first_start_var = 1
+
+def popcorn_cycle():
+    global first_start_var
+    global regen_popcorn_flag
+    global stable_iteration
+    global stable_iteration_str
+    global lasttweetdate
+    global lasttweetid
+    global popcorn
+
+
+    if first_start_var == 0:
+        print('Not Finished Setup')
+        lasttweetdate = None
+        lasttweetid = None
+    elif first_start_var == 1:
+        if regen_popcorn_flag == 1:
+            print(lasttweetdate)
+            print(lasttweetid)
+            popcorn = Popcorn.Popcorn(stable_iteration, stable_iteration_str, "daily", lasttweetid, lasttweetdate)
+            popcorn.main()
+            regen_popcorn_flag = 0
+
+        elif regen_popcorn_flag == 0:
+            popcorn.main()
+            lasttweetdate = popcorn.lasttweetdate
+            lasttweetid = popcorn.lasttweetid
+
+
+if __name__ == "__main__":
+    global first_start_var
+    first_start_var = 0
+    global regen_popcorn_flag
+    regen_popcorn_flag = 0
+    global popcorn
+    popcorn = None
+    
+    scheduler=BlockingScheduler()
+    scheduler.add_job(cycle_1_min, 'cron', second=1)
+    scheduler.add_job(popcorn_cycle, 'cron', second='*/10')
+    scheduler.start()

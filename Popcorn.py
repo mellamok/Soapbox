@@ -28,6 +28,7 @@ class Popcorn:
             self.skipfirst = True
         else:
             self.nextid = None
+            self.skipfirst = False
 
 
     def create_master_connection(self):
@@ -101,12 +102,15 @@ class Popcorn:
 
     def main(self):
         self.connect = self.create_master_connection()
+        if self.skipfirst == False:
+            self.nextid = self.find_next_id(self.connect, self.lasttweetid[0], self.lasttweetdate[0])
+        elif self.skipfirst == True:
+            self.skipfirst = False
         self.displaydata = self.print_tweet(self.connect, self.nextid)
-        for row in self.displaydata:
-            print(row)
         self.lasttweetdate = self.find_last_tweet_date(self.connect, self.nextid)
         self.lasttweetid = self.find_last_tweet_id(self.connect, self.nextid)
-        self.nextid = self.find_next_id(self.connect, self.lasttweetid[0], self.lasttweetdate[0])
+        for row in self.displaydata:
+            print(row)
         self.connect.close()
 
 #Run as test
@@ -116,4 +120,6 @@ if __name__ == "__main__":
     x = Popcorn(fakedate, fakedate_str, "daily", None, None)
     x.main()
     x.main()
-    x.main()
+    y = Popcorn(fakedate, fakedate_str, "daily", x.lasttweetid, x.lasttweetdate)
+    y.main()
+    y.main()
