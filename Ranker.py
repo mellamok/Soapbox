@@ -52,11 +52,12 @@ class Ranker:
         self.filters = '''language = 'en' AND entities_media_count = 0 AND retweeted_status = '' AND truncated = 0'''
         self.ordering = 'score DESC'
         self.tweet_dt = 'created_at'
+        self.cron_ordering = 'created_at ASC'
         self.c = connect.cursor()
         #Create modified table (drop if exists)
         self.c.execute("DROP TABLE IF EXISTS {newtab}".format(newtab=self.newtable))
-        self.c.execute("CREATE TABLE {newtab} AS SELECT {vars}, {filtervars} FROM {oldtab}" \
-            .format(newtab=self.newtable, vars=self.pullvars, filtervars=self.filtervars, oldtab=self.oldtable))
+        self.c.execute("CREATE TABLE {newtab} AS SELECT {vars}, {filtervars} FROM {oldtab} ORDER BY {order}" \
+            .format(newtab=self.newtable, vars=self.pullvars, filtervars=self.filtervars, oldtab=self.oldtable, order=self.cron_ordering))
         #Add in Score
         self.c.execute("ALTER TABLE {tn} ADD COLUMN '{cn}' {ct}"\
             .format(tn=self.newtable, cn=self.scorecol, ct=self.coltype))
