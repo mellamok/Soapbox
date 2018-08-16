@@ -39,11 +39,6 @@ from sqlalchemy.sql import join
 
 from datetime import datetime, date, time
 
-# 2) Sets program parameters
-
-# Set search terms
-ids = ["%23soapbox -filter:retweets -filter:media", "@internetsoapbox -filter:retweets -filter:media",]
-
 # Store Twitter OAuth information     
 from twython import Twython
 
@@ -247,18 +242,19 @@ def write_data(self, d):
         
 # 6) Exports dataset to SQL
 class Scrape:
-    def __init__(self, filename): 
+    def __init__(self, filename, ids): 
         # Name SQL file after minute created (for Ranker pull)   
         engine = sqlalchemy.create_engine("sqlite:///Puller Data/%s" 
         % (filename), echo=False)
         Session = sessionmaker(bind=engine)
         self.session = Session()  
         Base.metadata.create_all(engine)
+        self.ids = ids
 
     # Keep searching until a full page with 0 relevant tweets is found
     def main(self):
-        for n, kid in enumerate(ids):
-            print ("\rprocessing id %s/%s" % (n+1, len(ids)),
+        for n, kid in enumerate(self.ids):
+            print ("\rprocessing id %s/%s" % (n+1, len(self.ids)),
             sys.stdout.flush())
 
             d = get_data(kid)
@@ -318,5 +314,8 @@ class Scrape:
         self.session.close()
 
 if __name__ == "__main__":
-    s = Scrape("testfile")
+    
+# Set search terms
+    ids = ["%23soapbox -filter:retweets -filter:media", "@internetsoapbox -filter:retweets -filter:media",]
+    s = Scrape("testfile", ids)
     s.main()
