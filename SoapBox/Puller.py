@@ -38,15 +38,16 @@ from sqlalchemy import Unicode
 from sqlalchemy.sql import join
 
 from datetime import datetime, date, time
+    
+from twython import Twython
+
 
 # 2) Sets program parameters
 
 # Set search terms
 ids = ["%23soapbox -filter:retweets -filter:media", "@internetsoapbox -filter:retweets -filter:media",]
 
-# Store Twitter OAuth information     
-from twython import Twython
-
+# Store Twitter OAuth information 
 app_key = "xk2ajQiez4T2FYn9KFaNQ2P4D"
 app_secret = "SVvydq1TvzC7toySPhhf0WLbqHLPqY4QUUH2hUGl6U7Lsk5enl"
 oauth_token = "899444168132579328-hjXPXWDzX9GTtIsUZuXsbc0U6GoT2Tr"
@@ -59,6 +60,7 @@ Base = declarative_base()
 
 # 3) Structures the output dataset
 class Messages(Base):
+
     __tablename__ = 'hashtags'
     
     # Set columns
@@ -247,6 +249,7 @@ def write_data(self, d):
         
 # 6) Exports dataset to SQL
 class Scrape:
+    
     def __init__(self, filename): 
         # Name SQL file after minute created (for Ranker pull)   
         engine = sqlalchemy.create_engine("sqlite:///Puller Data/%s" 

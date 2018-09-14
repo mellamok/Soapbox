@@ -1,5 +1,6 @@
-import time
 import datetime
+import time
+
 
 start_time = datetime.datetime.now()
 
@@ -42,5 +43,3 @@ while True:
         
     else:
         print('Sorry, command is unrecognized.')
-
-    
