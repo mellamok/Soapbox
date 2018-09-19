@@ -1,5 +1,7 @@
 from time import sleep
+
 from apscheduler.schedulers.blocking import BlockingScheduler
+
 
 def a_cycle():
     print("Tick")
@@ -13,6 +15,7 @@ def b_cycle():
     sleep(2)
     print("Out")
     sleep(2)
+
 
 scheduler=BlockingScheduler()
 scheduler.add_job(a_cycle, 'cron', second = '*/5')

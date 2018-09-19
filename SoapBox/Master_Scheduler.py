@@ -1,8 +1,9 @@
 import datetime
-import Puller
-import Ranker
-import Popcorn
+
 from apscheduler.schedulers.blocking import BlockingScheduler
+
+from SoapBox import Ranker, Popcorn
+
 
 def cycle_1_min():
     #Pass the timestamp to the various programs

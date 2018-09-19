@@ -1,4 +1,4 @@
-'''
+"""
 RANKER VERSION 1.0 (3.5.18)
 Py 3.X
 Augustus Urschel
@@ -8,16 +8,16 @@ By [X]All-Time [X]Daily [X]Hourly:
     3) Filter out bad tweets on [] 0 Score []Profanity []Suspected AI []Other
     4) Score & Rank Tweets on [X]Retweets [X]Likes []Patronage
     5) Save for Scoreboard
-'''
-#Setup
+"""
+import csv
+import datetime
 import os
 import string
 import sqlite3
-import datetime
-from sqlite3 import Error
-import csv
+
 
 class Ranker:
+
     def __init__(self, iteration, iteration_str, cycle):
         self.cycle = cycle
         self.iteration = iteration
@@ -35,7 +35,7 @@ class Ranker:
         try:
             self.conn_master = sqlite3.connect(self.inputloc)
             return self.conn_master
-        except Error as e:
+        except sqlite3.Error as e:
             print(e)
 
         return None

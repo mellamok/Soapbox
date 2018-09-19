@@ -1,9 +1,4 @@
-import os
-import string
-import sqlite3
-import datetime
-from sqlite3 import Error
-'''
+"""
 POPCORN
 Date: 3 June 2018
 Author: Augustus Urschel
@@ -12,9 +7,15 @@ This file does the following:
 2) If not already running, begins at the earliest tweet
 3) If already running, receives the last tweetid/tweetdate
 4) Locates the next tweet in line and passes it as an output
-'''
+"""
+import datetime
+import os
+import string
+import sqlite3
+
 
 class Popcorn:
+    
     def __init__(self, iteration, iteration_str, cycle, lasttweetid, lasttweetdate):
         self.cycle = cycle
         self.iteration = iteration
@@ -39,7 +40,7 @@ class Popcorn:
         try:
             self.conn_master = sqlite3.connect(self.inputloc)
             return self.conn_master
-        except Error as e:
+        except sqlite3.Error as e:
             print(e)
         return None
 
