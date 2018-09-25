@@ -42,7 +42,7 @@ class Ranker:
 
     def datapull_master(self, connect):
         """Pulls data from the master, scores tweets, and filters."""
-        self.newtable = 'modified'
+        self.newtable = 'popcorn'
         self.oldtable = 'hashtags'
         self.scorecol = 'score'
         self.coltype = 'INTEGER'
@@ -64,44 +64,43 @@ class Ranker:
         self.c.execute("UPDATE {tn} SET {scorecol} = {fvt} + 5*{rt}"\
             .format(tn=self.newtable, scorecol=self.scorecol, fvt='favorite_count', rt='retweet_count'))
         connect.commit()
-        #Pull from table, by cycle
 
-        if self.cycle == "alltime":
-            self.c.execute("SELECT {vars_m} FROM {tn} WHERE {filter} ORDER BY {order}" \
-                .format(vars_m=self.modvars, tn=self.newtable, filter=self.filters, order=self.ordering))
-        elif self.cycle == "daily":
-            self.sql_daily_min = ('{year}-{month}-{day} 00:00:00.000000' \
-                .format(year=self.iteration.year, month='{:02d}'.format(self.iteration.month), day='{:02d}'.format(self.iteration.day)))
-            self.c.execute("SELECT {vars_m} FROM {tn} WHERE {filter} AND {datecol} >= '{datelimit}' ORDER BY {order}" \
-                .format(vars_m=self.modvars, tn=self.newtable, filter=self.filters, datecol=self.tweet_dt, datelimit=self.sql_daily_min, order=self.ordering))
-        elif self.cycle == "hourly":
-            self.sql_hourly_min = ('{year}-{month}-{day} {hour}:00:00.000000' \
-                .format(year=self.iteration.year, month='{:02d}'.format(self.iteration.month), day='{:02d}'.format(self.iteration.day), hour='{:02d}'.format(self.iteration.hour)))
-            self.c.execute("SELECT {vars_m} FROM {tn} WHERE {filter} AND {datecol} >= '{datelimit}' ORDER BY {order}" \
-                .format(vars_m=self.modvars, tn=self.newtable, filter=self.filters, datecol=self.tweet_dt, datelimit=self.sql_hourly_min, order=self.ordering))
+    def rank_sort_data(self, connect):
+        self.oldtable = 'popcorn'
+        self.alltable = 'alltable'
+        self.daytable = 'daytable'
+        self.hourtable = 'hourtable'
+        self.vars ='tweet_id, created_at, from_user_screen_name, from_user_id, favorite_count, retweet_count, score, content'
+        self.ordering = 'score DESC'
+        self.tweet_dt = 'created_at'
+        self.c = connect.cursor()
 
-        self.data = self.c.fetchall() #note: This reads all data in the cursor to memory. Will cause performance issues. Change to "for row in c: print row"
-        return self.data
+        #Create alltime table (drop if exists)
+        self.c.execute("DROP TABLE IF EXISTS {newtab}".format(newtab=self.alltable))
+        self.c.execute("CREATE TABLE {newtab} AS SELECT {vars} FROM {tn} ORDER BY {order}" \
+            .format(vars=self.vars, newtab=self.alltable, tn=self.oldtable, order=self.ordering))
 
-    def to_csv(self, dataframe, iteration_output):
-        """Write the data to a csv file"""
-        self.cwd = os.getcwd()
-        self.savedir = self.cwd + "\\CSV Output\\"
-        self.csvpath = self.savedir + iteration_output
-        with open(self.csvpath, 'w', newline='', encoding='utf-8') as self.csvfile: #utf-16 also works(ish)
-            self.fieldnames = ['Tweet_ID', 'Tweet_Date', 'User_Name', 'User_ID', 'Favorite_CT', 'Retweet_CT', 'score', 'Content']
-            self.dictwriter = csv.DictWriter(self.csvfile, fieldnames=self.fieldnames)
-            self.datawriter = csv.writer(self.csvfile, 'excel')
-            self.dictwriter.writeheader()
-            for row in dataframe:
-                self.datawriter.writerow(row)
+        #Create daily table (drop if exists)
+        self.sql_daily_min = ('{year}-{month}-{day} 00:00:00.000000' \
+            .format(year=self.iteration.year, month='{:02d}'.format(self.iteration.month), day='{:02d}'.format(self.iteration.day)))
+            
+        self.c.execute("DROP TABLE IF EXISTS {newtab}".format(newtab=self.daytable))
+        self.c.execute("CREATE TABLE {newtab} AS SELECT {vars} FROM {tn} WHERE {datecol} >= '{datelimit}' ORDER BY {order}" \
+            .format(vars=self.vars, newtab=self.daytable, tn=self.oldtable, datecol=self.tweet_dt, datelimit=self.sql_daily_min, order=self.ordering))
+
+        #Create hourly table (drop if exists)
+        self.sql_hourly_min = ('{year}-{month}-{day} {hour}:00:00.000000' \
+            .format(year=self.iteration.year, month='{:02d}'.format(self.iteration.month), day='{:02d}'.format(self.iteration.day), hour='{:02d}'.format(self.iteration.hour)))
+
+        self.c.execute("DROP TABLE IF EXISTS {newtab}".format(newtab=self.hourtable))
+        self.c.execute("CREATE TABLE {newtab} AS SELECT {vars} FROM {tn} WHERE {datecol} >= '{datelimit}' ORDER BY {order}" \
+            .format(vars=self.vars, newtab=self.hourtable, tn=self.oldtable, datecol=self.tweet_dt, datelimit=self.sql_daily_min, order=self.ordering))
+        connect.commit()
 
     def main(self):
         self.connect = self.create_master_connection()
-        self.x = self.datapull_master(self.connect)
-        #for row in self.x:
-            #print(row)
-        self.to_csv(self.x, self.iteration_output)
+        self.datapull_master(self.connect)
+        self.rank_sort_data(self.connect)
         self.connect.close()
 
 #Run

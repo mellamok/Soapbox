@@ -14,8 +14,10 @@ def cycle_1_min():
     iteration_file_puller = "Puller {year} {month} {day} {hour} {minute}.sqlite".format(year=now.year, month=now.month, day=now.day, hour=now.hour, minute=now.minute)
 
     #Do Puller
+    pullerids = ["%23soapbox -filter:retweets -filter:media", "@internetsoapbox -filter:retweets -filter:media",]
+
     print("Pulling file = ", iteration_file_puller)
-    startpull = Puller.Scrape(iteration_file_puller)
+    startpull = Puller.Scrape(iteration_file_puller, pullerids)
     startpull.main()
     print("Pulling complete!")
     pullerfinish = datetime.datetime.now() - now
